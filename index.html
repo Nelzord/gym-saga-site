@@ -1,13 +1,1496 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>GymSaga</title>
-</head>
-<body style="background:#111;color:white;font-family:sans-serif;text-align:center;padding:40px;">
-  <h1>GymSaga</h1>
-  <p>Turn your workouts into RPG progression.</p>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GymSaga — Turn your real-world workouts into RPG progression. Level up, battle bosses, unlock gear, and build your character.">
+  <title>GymSaga — Turn Your Workouts Into an RPG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #000000;
+      --charcoal: #0a0a0c;
+      --panel: #111116;
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --neon: #00ff88;
+      --neon-dim: rgba(0, 255, 136, 0.15);
+      --emerald: #10b981;
+      --cyan: #00e5ff;
+      --purple: #a855f7;
+      --gold: #ffd700;
+      --white: #f8fafc;
+      --muted: #94a3b8;
+      --font-display: 'Orbitron', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --nav-h: 72px;
+      --glow-green: 0 0 20px rgba(0, 255, 136, 0.4), 0 0 60px rgba(0, 255, 136, 0.15);
+      --glow-cyan: 0 0 20px rgba(0, 229, 255, 0.35);
+      --glow-purple: 0 0 30px rgba(168, 85, 247, 0.3);
+    }
 
-  <h2>Features</h2>
-  <p>Level up, unlock gear, battle enemies, and track real workouts.</p>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    body.view-privacy, body.view-plans { overflow-y: auto; }
+
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(1rem, 4vw, 2.5rem);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--panel-border);
+      transition: background 0.3s;
+    }
+    .nav.scrolled { background: rgba(0, 0, 0, 0.92); }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      color: var(--white);
+      text-decoration: none;
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    }
+    .nav-logo span { color: var(--neon); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.06);
+      text-decoration: none;
+    }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.1rem !important;
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 229, 255, 0.1));
+      border: 1px solid rgba(0, 255, 136, 0.4);
+      color: var(--neon) !important;
+      font-family: var(--font-display);
+      font-size: 0.7rem !important;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      border-radius: 999px !important;
+      box-shadow: var(--glow-green);
+      transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 229, 255, 0.15)) !important;
+      text-decoration: none !important;
+    }
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--panel-border);
+      color: var(--white);
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    /* ── VIEWS ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.9rem 1.75rem;
+      border-radius: 12px;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon), var(--emerald));
+      color: var(--black);
+      box-shadow: var(--glow-green);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 0 40px rgba(0, 255, 136, 0.6);
+      text-decoration: none;
+    }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+    }
+    .btn-ghost:hover {
+      border-color: var(--cyan);
+      box-shadow: var(--glow-cyan);
+      transform: translateY(-2px);
+      text-decoration: none;
+    }
+    .store-btns { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+    .store-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.75rem 1.25rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: var(--white);
+      text-decoration: none;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      min-width: 180px;
+    }
+    .store-btn:hover {
+      border-color: var(--neon);
+      box-shadow: var(--glow-green);
+      transform: translateY(-2px);
+      text-decoration: none;
+    }
+    .store-btn svg { flex-shrink: 0; }
+    .store-btn small { display: block; font-size: 0.65rem; color: var(--muted); line-height: 1.2; }
+    .store-btn strong { display: block; font-size: 0.95rem; font-weight: 600; line-height: 1.2; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: calc(var(--nav-h) + 2rem) clamp(1.25rem, 5vw, 4rem) 4rem;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0, 255, 136, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 60%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 40% at 10% 80%, rgba(0, 229, 255, 0.08) 0%, transparent 50%),
+        var(--black);
+    }
+    .hero-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.03) 0%, transparent 40%, rgba(168, 85, 247, 0.04) 100%);
+      animation: gradientShift 8s ease-in-out infinite alternate;
+    }
+    @keyframes gradientShift {
+      0% { opacity: 0.6; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.05); }
+    }
+    #particles { position: absolute; inset: 0; pointer-events: none; }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 80%);
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.9rem;
+      background: rgba(0, 255, 136, 0.08);
+      border: 1px solid rgba(0, 255, 136, 0.25);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--neon);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--neon);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--neon);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
+      50% { box-shadow: 0 0 25px rgba(0, 255, 136, 0.4); }
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5.5vw, 4.2rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 .line { display: block; }
+    .hero h1 .accent {
+      background: linear-gradient(90deg, var(--neon), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.4));
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 2rem;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2.5rem; }
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .hero-stat strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--neon);
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    }
+    .hero-stat span { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    /* Phone mockup */
+    .hero-phone-wrap {
+      display: flex;
+      justify-content: center;
+      perspective: 1000px;
+    }
+    .phone {
+      position: relative;
+      width: min(280px, 80vw);
+      aspect-ratio: 9/19;
+      background: linear-gradient(160deg, #1a1a22, #0d0d10);
+      border-radius: 36px;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      box-shadow:
+        0 0 0 1px rgba(0, 255, 136, 0.1),
+        0 30px 80px rgba(0, 0, 0, 0.8),
+        0 0 60px rgba(0, 255, 136, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      animation: floatPhone 6s ease-in-out infinite;
+      transform: rotateY(-8deg) rotateX(4deg);
+    }
+    @keyframes floatPhone {
+      0%, 100% { transform: rotateY(-8deg) rotateX(4deg) translateY(0); }
+      50% { transform: rotateY(-8deg) rotateX(4deg) translateY(-14px); }
+    }
+    .phone-notch {
+      position: absolute;
+      top: 10px; left: 50%;
+      transform: translateX(-50%);
+      width: 90px; height: 24px;
+      background: var(--black);
+      border-radius: 0 0 16px 16px;
+      z-index: 5;
+    }
+    .phone-screen {
+      position: absolute;
+      inset: 8px;
+      border-radius: 30px;
+      background: linear-gradient(180deg, #0f1419 0%, #060809 100%);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .phone-ui-top {
+      padding: 2.5rem 1rem 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .phone-lvl {
+      font-family: var(--font-display);
+      font-size: 0.55rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+    }
+    .phone-xp-bar {
+      margin: 0 1rem;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .phone-xp-fill {
+      height: 100%;
+      width: 72%;
+      background: linear-gradient(90deg, var(--neon), var(--cyan));
+      border-radius: 999px;
+      box-shadow: 0 0 10px var(--neon);
+      animation: xpPulse 2s ease-in-out infinite;
+    }
+    @keyframes xpPulse {
+      0%, 100% { box-shadow: 0 0 8px var(--neon); }
+      50% { box-shadow: 0 0 16px var(--neon); }
+    }
+    .phone-character {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .phone-aura {
+      position: absolute;
+      width: 140px; height: 140px;
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 50%;
+      animation: auraSpin 8s linear infinite;
+    }
+    @keyframes auraSpin { to { transform: rotate(360deg); } }
+    .phone-boss {
+      position: absolute;
+      bottom: 1rem; right: 1rem;
+      padding: 0.35rem 0.6rem;
+      background: rgba(255, 0, 80, 0.15);
+      border: 1px solid rgba(255, 50, 100, 0.4);
+      border-radius: 8px;
+      font-size: 0.55rem;
+      font-family: var(--font-display);
+      color: #ff5080;
+      letter-spacing: 0.08em;
+      animation: bossPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes bossPulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 50, 100, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(255, 50, 100, 0.6); }
+    }
+    .phone-ui-bottom {
+      padding: 0.75rem 1rem 1.25rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+    }
+    .phone-stat {
+      text-align: center;
+      padding: 0.4rem;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .phone-stat val {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      color: var(--neon);
+    }
+    .phone-stat lbl {
+      display: block;
+      font-size: 0.45rem;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .phone-glow-ring {
+      position: absolute;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation: ringExpand 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes ringExpand {
+      0%, 100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; }
+      50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
+    }
+
+    /* ── SECTIONS ── */
+    .section-label {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--neon);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+    .section-desc {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 440px;
+    }
+
+    .features-strip {
+      padding: 5rem clamp(1.25rem, 5vw, 4rem);
+      background: var(--charcoal);
+      border-top: 1px solid var(--panel-border);
+      border-bottom: 1px solid var(--panel-border);
+    }
+    .features-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+    }
+    .feature-pill {
+      text-align: center;
+      padding: 1.25rem 0.75rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+    }
+    .feature-pill:hover {
+      border-color: rgba(0, 255, 136, 0.3);
+      box-shadow: var(--glow-green);
+      transform: translateY(-4px);
+    }
+    .feature-pill .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.5rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(0, 255, 136, 0.06);
+      border: 1px solid rgba(0, 255, 136, 0.15);
+    }
+    .svg-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .svg-icon.sm { width: 0.75rem; height: 0.75rem; }
+    .svg-icon.md { width: 1.5rem; height: 1.5rem; }
+    .svg-icon.lg { width: 2.5rem; height: 2.5rem; }
+    .svg-icon.xl { width: 3rem; height: 3rem; }
+    .icon-neon { color: var(--neon); filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.5)); }
+    .icon-cyan { color: var(--cyan); filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4)); }
+    .icon-gold { color: var(--gold); filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4)); }
+    .icon-purple { color: var(--purple); filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.4)); }
+    .icon-red { color: #ff5080; filter: drop-shadow(0 0 8px rgba(255, 80, 128, 0.5)); }
+    .phone-avatar {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(0, 255, 136, 0.3), rgba(168, 85, 247, 0.2));
+      border: 2px solid rgba(0, 255, 136, 0.5);
+      box-shadow: 0 0 40px rgba(0, 255, 136, 0.3), var(--glow-purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .phone-avatar .svg-icon { width: 2.75rem; height: 2.75rem; }
+    .phone-gold {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.55rem;
+      color: var(--gold);
+    }
+    .mock-icon-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mock-slot {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-toggle .svg-icon { width: 1.25rem; height: 1.25rem; color: var(--white); }
+    .feature-pill span {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--white);
+    }
+
+    .feature-block {
+      padding: 6rem clamp(1.25rem, 5vw, 4rem);
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-block:nth-child(even) { background: var(--charcoal); }
+    .feature-block::before {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .feature-block.green-glow::before { background: var(--neon); top: -100px; right: -100px; }
+    .feature-block.purple-glow::before { background: var(--purple); bottom: -100px; left: -100px; }
+    .feature-block.cyan-glow::before { background: var(--cyan); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+    .feature-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .feature-block.reverse .feature-inner { direction: rtl; }
+    .feature-block.reverse .feature-inner > * { direction: ltr; }
+
+    .feature-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .glass-card:hover {
+      border-color: rgba(0, 255, 136, 0.25);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), var(--glow-green);
+    }
+    .mock-ui {
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 4/3;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mock-ui.workout {
+      background: linear-gradient(135deg, #0d1a14, #0a0f0c);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+    .mock-ui.rpg {
+      background: linear-gradient(135deg, #120d1a, #0a0810);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+    }
+    .mock-ui.boss {
+      background: linear-gradient(135deg, #1a0a0f, #0f0608);
+      border: 1px solid rgba(255, 50, 100, 0.3);
+    }
+    .mock-ui.gear {
+      background: linear-gradient(135deg, #1a1508, #0f0c06);
+      border: 1px solid rgba(255, 215, 0, 0.25);
+    }
+    .mock-ui.xp {
+      background: linear-gradient(135deg, #0a141a, #060a0f);
+      border: 1px solid rgba(0, 229, 255, 0.25);
+    }
+    .mock-ui.streak {
+      background: linear-gradient(135deg, #141a0a, #0a0f06);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+    .mock-ui.ai {
+      background: linear-gradient(135deg, #0a0f1a, #060810);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+    }
+    .mock-ui.premium {
+      background: linear-gradient(135deg, #1a1208, #100a04);
+      border: 1px solid rgba(255, 215, 0, 0.35);
+    }
+    .mock-content {
+      position: absolute;
+      inset: 0;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .mock-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .mock-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+    .mock-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .mock-tag {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.65rem;
+      font-family: var(--font-display);
+      letter-spacing: 0.06em;
+    }
+
+    .feature-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+    .tag {
+      padding: 0.35rem 0.75rem;
+      background: rgba(0, 255, 136, 0.08);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      color: var(--neon);
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 7rem clamp(1.25rem, 5vw, 4rem);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 100%, rgba(0, 255, 136, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 20% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+    }
+    .cta-inner { position: relative; max-width: 640px; margin: 0 auto; }
+    .cta-inner h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 900;
+      margin-bottom: 1rem;
+      line-height: 1.1;
+    }
+    .cta-inner p { color: var(--muted); font-size: 1.1rem; margin-bottom: 2rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2.5rem clamp(1.25rem, 5vw, 4rem);
+      border-top: 1px solid var(--panel-border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      background: var(--charcoal);
+    }
+    footer p { font-size: 0.85rem; color: var(--muted); }
+    footer nav { display: flex; gap: 1.5rem; }
+    footer nav a { color: var(--muted); font-size: 0.85rem; text-decoration: none; }
+    footer nav a:hover { color: var(--neon); text-decoration: none; }
+
+    /* ── LEGAL VIEWS ── */
+    .legal-view {
+      padding: calc(var(--nav-h) + 3rem) clamp(1.25rem, 5vw, 4rem) 4rem;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .legal-view h1 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .legal-view h2 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--neon);
+    }
+    .legal-view h3 { margin-top: 1.25rem; font-size: 1rem; }
+    .legal-view p, .legal-view li { color: #cbd5e1; margin-bottom: 0.75rem; }
+    .legal-view ul { padding-left: 1.25rem; }
+
+    .plans-grid {
+      display: grid;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .plan-card {
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      transition: border-color 0.3s;
+    }
+    .plan-card:hover { border-color: rgba(0, 255, 136, 0.25); }
+    .plan-card h3 {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      color: var(--cyan);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-inner, .feature-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .hero-content { text-align: center; }
+      .hero-sub { margin-left: auto; margin-right: auto; }
+      .hero-actions, .hero-stats { justify-content: center; }
+      .hero-phone-wrap { order: -1; }
+      .feature-block.reverse .feature-inner { direction: ltr; }
+      .feature-inner { gap: 2rem; }
+      .feature-text { text-align: center; }
+      .section-desc { margin-left: auto; margin-right: auto; }
+      .feature-tags { justify-content: center; }
+    }
+    @media (max-width: 680px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: var(--nav-h);
+        left: 0; right: 0;
+        flex-direction: column;
+        background: rgba(0, 0, 0, 0.95);
+        padding: 1rem;
+        border-bottom: 1px solid var(--panel-border);
+      }
+      .nav-links.open { display: flex; }
+      .nav-toggle { display: flex; align-items: center; justify-content: center; }
+      .feature-block { padding: 4rem 1.25rem; }
+      .features-strip { padding: 3rem 1.25rem; }
+    }
+  </style>
+</head>
+<body class="view-home">
+
+  <!-- SVG Icon Sprite -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="icon-dumbbell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2"/><path d="M6.5 6V3M17.5 6V3M6.5 21v-3M17.5 21v-3"/></symbol>
+    <symbol id="icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+    <symbol id="icon-skull" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="10" r="1.5"/><circle cx="15" cy="10" r="1.5"/><path d="M8 15h8"/><path d="M10 18v2M14 18v2"/><path d="M12 3a5 5 0 0 0-5 5v2a5 5 0 0 0 10 0V8a5 5 0 0 0-5-5z"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 6v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/></symbol>
+    <symbol id="icon-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4-2 7-6 7-11 0-3-2-5-4-6 0 3-2 4-3 5 0-4-2-7-5-9-1 4-3 6-5 8-2 2-3 4-3 7 0 3 2 5 4 6 1-2 3-3 5-3 1 2 2 3 4 3z"/></symbol>
+    <symbol id="icon-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/><rect x="9" y="9" width="6" height="6" rx="1"/></symbol>
+    <symbol id="icon-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18"/><path d="M4 18 6 8l4 5 2-8 2 8 4-5 2 10"/></symbol>
+    <symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.5 2.5 15.5 0 18"/><path d="M12 3c-2.5 2.5-2.5 15.5 0 18"/></symbol>
+    <symbol id="icon-sword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 2 7.5 7.5-9 9-5 2 2-5 9-9z"/><path d="M3 21 7 17"/></symbol>
+    <symbol id="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></symbol>
+  </svg>
+
+  <!-- NAV -->
+  <header class="nav" id="nav">
+    <a href="#home" class="nav-logo" data-view="home">GYM<span>SAGA</span></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu"><svg class="svg-icon"><use href="#icon-menu"/></svg></button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home" data-view="home" class="active">Home</a></li>
+      <li><a href="#features" data-scroll="features">Features</a></li>
+      <li><a href="#privacy" data-view="privacy">Privacy</a></li>
+      <li><a href="#plans" data-view="plans">Future Plans</a></li>
+      <li><a href="#download" class="nav-cta" data-scroll="download">Download</a></li>
+    </ul>
+  </header>
+
+  <!-- HOME / LANDING -->
+  <div id="view-home" class="view active">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-gradient"></div>
+      <div class="hero-grid"></div>
+      <canvas id="particles"></canvas>
+
+      <div class="hero-inner">
+        <div class="hero-content reveal">
+          <div class="hero-badge">Fitness RPG · Now in Development</div>
+          <h1>
+            <span class="line">Turn Your</span>
+            <span class="line accent">Workouts Into</span>
+            <span class="line">an RPG.</span>
+          </h1>
+          <p class="hero-sub">Every rep earns XP. Every session levels you up. Battle bosses, unlock legendary gear, and progress through worlds — all powered by your real gym sessions.</p>
+          <div class="hero-actions">
+            <a href="#download" class="btn btn-primary" data-scroll="download">Start Your Saga</a>
+            <a href="#features" class="btn btn-ghost" data-scroll="features">See Features</a>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><strong>XP</strong><span>Every Workout</span></div>
+            <div class="hero-stat"><strong>LVL</strong><span>Real Progression</span></div>
+            <div class="hero-stat"><strong>BOSS</strong><span>Epic Battles</span></div>
+          </div>
+        </div>
+
+        <div class="hero-phone-wrap reveal reveal-delay-2">
+          <div class="phone-glow-ring"></div>
+          <div class="phone" id="heroPhone">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="phone-ui-top">
+                <span class="phone-lvl">LV. 47</span>
+                <span class="phone-gold"><svg class="svg-icon sm icon-gold"><use href="#icon-zap"/></svg> 2,840 G</span>
+              </div>
+              <div class="phone-xp-bar"><div class="phone-xp-fill"></div></div>
+              <div class="phone-character">
+                <div class="phone-aura"></div>
+                <div class="phone-avatar"><svg class="svg-icon icon-neon"><use href="#icon-user"/></svg></div>
+                <div class="phone-boss">BOSS NEARBY</div>
+              </div>
+              <div class="phone-ui-bottom">
+                <div class="phone-stat"><val>+420</val><lbl>XP Today</lbl></div>
+                <div class="phone-stat"><val>12</val><lbl>Day Streak</lbl></div>
+                <div class="phone-stat"><val>3</val><lbl>Worlds</lbl></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK FEATURES STRIP -->
+    <section class="features-strip" id="features">
+      <div class="features-grid reveal">
+        <div class="feature-pill"><span class="icon"><svg class="svg-icon icon-neon"><use href="#icon-dumbbell"/></svg></span><span>Workouts</span></div>
+        <div class="feature-pill"><span class="icon"><svg class="svg-icon icon-cyan"><use href="#icon-zap"/></svg></span><span>XP &amp; Levels</span></div>
+        <div class="feature-pill"><span class="icon"><svg class="svg-icon icon-red"><use href="#icon-skull"/></svg></span><span>Boss Battles</span></div>
+        <div class="feature-pill"><span class="icon"><svg class="svg-icon icon-cyan"><use href="#icon-shield"/></svg></span><span>Gear &amp; Auras</span></div>
+        <div class="feature-pill"><span class="icon"><svg class="svg-icon icon-neon"><use href="#icon-flame"/></svg></span><span>Streaks</span></div>
+        <div class="feature-pill"><span class="icon"><svg class="svg-icon icon-cyan"><use href="#icon-cpu"/></svg></span><span>AI Coach</span></div>
+        <div class="feature-pill"><span class="icon"><svg class="svg-icon icon-gold"><use href="#icon-crown"/></svg></span><span>Premium</span></div>
+        <div class="feature-pill"><span class="icon"><svg class="svg-icon icon-purple"><use href="#icon-globe"/></svg></span><span>Worlds</span></div>
+      </div>
+    </section>
+
+    <!-- FEATURE: WORKOUT TRACKING -->
+    <section class="feature-block green-glow">
+      <div class="feature-inner">
+        <div class="feature-text reveal">
+          <p class="section-label">01 · Core System</p>
+          <h2 class="section-title">Track Every Rep.<br>Earn Every Reward.</h2>
+          <p class="section-desc">Log sets, reps, weight, and duration like a pro tracker — but every completed exercise feeds directly into your RPG character.</p>
+          <div class="feature-tags">
+            <span class="tag">Set Logging</span>
+            <span class="tag">Exercise Library</span>
+            <span class="tag">Session History</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal reveal-delay-1">
+          <div class="glass-card">
+            <div class="mock-ui workout">
+              <div class="mock-content">
+                <div class="mock-row"><span style="color:var(--neon);font-family:var(--font-display);font-size:0.7rem;">ACTIVE SESSION</span></div>
+                <div class="mock-row" style="color:var(--white);font-size:0.9rem;font-weight:600;">Bench Press · Set 3/4</div>
+                <div class="mock-bar"><div class="mock-bar-fill" style="width:75%;background:linear-gradient(90deg,var(--neon),var(--cyan));"></div></div>
+                <div class="mock-row">225 lbs × 8 reps</div>
+                <div class="mock-row"><span class="mock-tag" style="background:rgba(0,255,136,0.15);color:var(--neon);">+85 XP</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE: RPG PROGRESSION -->
+    <section class="feature-block purple-glow reverse">
+      <div class="feature-inner">
+        <div class="feature-text reveal">
+          <p class="section-label">02 · Progression</p>
+          <h2 class="section-title">Your Gym Stats<br>Are Your Build.</h2>
+          <p class="section-desc">Strength, endurance, agility — your real training shapes your character's stats. No fake numbers. Real effort, real power.</p>
+          <div class="feature-tags">
+            <span class="tag">Character Stats</span>
+            <span class="tag">Skill Trees</span>
+            <span class="tag">World Unlocks</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal reveal-delay-1">
+          <div class="glass-card">
+            <div class="mock-ui rpg">
+              <div class="mock-content">
+                <div class="mock-row" style="justify-content:space-between;"><span style="color:var(--purple);font-family:var(--font-display);font-size:0.65rem;">SHADOW KNIGHT</span><span style="color:var(--gold);font-size:0.7rem;">LV. 47</span></div>
+                <div class="mock-row"><span>STR</span><div class="mock-bar" style="flex:1;"><div class="mock-bar-fill" style="width:88%;background:var(--purple);"></div></div><span style="color:var(--white);">88</span></div>
+                <div class="mock-row"><span>END</span><div class="mock-bar" style="flex:1;"><div class="mock-bar-fill" style="width:72%;background:var(--cyan);"></div></div><span style="color:var(--white);">72</span></div>
+                <div class="mock-row"><span>AGI</span><div class="mock-bar" style="flex:1;"><div class="mock-bar-fill" style="width:65%;background:var(--neon);"></div></div><span style="color:var(--white);">65</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE: BOSS BATTLES -->
+    <section class="feature-block green-glow">
+      <div class="feature-inner">
+        <div class="feature-text reveal">
+          <p class="section-label">03 · Combat</p>
+          <h2 class="section-title">Face Bosses.<br>Powered by Sweat.</h2>
+          <p class="section-desc">Epic boss encounters that scale with your fitness. Complete workout challenges to deal damage, dodge attacks, and claim legendary loot.</p>
+          <div class="feature-tags">
+            <span class="tag">Boss Raids</span>
+            <span class="tag">Combat UI</span>
+            <span class="tag">Rare Drops</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal reveal-delay-1">
+          <div class="glass-card">
+            <div class="mock-ui boss">
+              <div class="mock-content" style="align-items:center;text-align:center;">
+                <div class="mock-icon-wrap"><svg class="svg-icon xl icon-red"><use href="#icon-skull"/></svg></div>
+                <div style="font-family:var(--font-display);font-size:0.75rem;color:#ff5080;letter-spacing:0.1em;">IRON TITAN</div>
+                <div class="mock-bar" style="width:100%;"><div class="mock-bar-fill" style="width:34%;background:linear-gradient(90deg,#ff2060,#ff5080);animation:xpPulse 1.5s infinite;"></div></div>
+                <div class="mock-row" style="color:#ff8090;font-size:0.65rem;">YOUR WORKOUT DEALS DAMAGE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE: GEAR & AURAS -->
+    <section class="feature-block purple-glow reverse">
+      <div class="feature-inner">
+        <div class="feature-text reveal">
+          <p class="section-label">04 · Loot</p>
+          <h2 class="section-title">Unlock Gear.<br>Equip Auras.</h2>
+          <p class="section-desc">Earn gold from workouts and spend it on weapons, armor, and glowing auras that showcase your grind. Flex your progression.</p>
+          <div class="feature-tags">
+            <span class="tag">Equipment</span>
+            <span class="tag">Auras</span>
+            <span class="tag">Gold Economy</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal reveal-delay-1">
+          <div class="glass-card">
+            <div class="mock-ui gear">
+              <div class="mock-content">
+                <div class="mock-row" style="color:var(--gold);font-family:var(--font-display);font-size:0.65rem;">INVENTORY</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.5rem;">
+                  <div class="mock-slot" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);"><svg class="svg-icon md icon-gold"><use href="#icon-sword"/></svg></div>
+                  <div class="mock-slot" style="background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);"><svg class="svg-icon md icon-cyan"><use href="#icon-shield"/></svg></div>
+                  <div class="mock-slot" style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);"><svg class="svg-icon md icon-purple"><use href="#icon-sparkles"/></svg></div>
+                </div>
+                <div class="mock-row" style="margin-top:0.5rem;color:var(--gold);">2,840 G · Legendary Blade Equipped</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE: XP & LEVELING -->
+    <section class="feature-block cyan-glow">
+      <div class="feature-inner">
+        <div class="feature-text reveal">
+          <p class="section-label">05 · Level Up</p>
+          <h2 class="section-title">Every Session<br>Levels You Up.</h2>
+          <p class="section-desc">Watch your XP bar fill after every workout. Level gates unlock new worlds, abilities, and story content. The grind IS the game.</p>
+          <div class="feature-tags">
+            <span class="tag">XP System</span>
+            <span class="tag">Level Rewards</span>
+            <span class="tag">World Gates</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal reveal-delay-1">
+          <div class="glass-card">
+            <div class="mock-ui xp">
+              <div class="mock-content">
+                <div class="mock-row" style="justify-content:space-between;color:var(--cyan);font-family:var(--font-display);font-size:0.65rem;"><span>LEVEL 47</span><span>72% TO LVL 48</span></div>
+                <div class="mock-bar" style="height:12px;"><div class="mock-bar-fill" style="width:72%;background:linear-gradient(90deg,var(--cyan),var(--neon));box-shadow:0 0 12px var(--cyan);"></div></div>
+                <div class="mock-row" style="color:var(--neon);font-size:0.8rem;font-weight:600;margin-top:0.5rem;">+420 XP · Workout Complete!</div>
+                <div class="mock-row" style="font-size:0.65rem;">New ability unlocked at Level 50</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE: STREAK REWARDS -->
+    <section class="feature-block green-glow reverse">
+      <div class="feature-inner">
+        <div class="feature-text reveal">
+          <p class="section-label">06 · Consistency</p>
+          <h2 class="section-title">Streaks That<br>Hit Different.</h2>
+          <p class="section-desc">Daily login bonuses, streak multipliers, and escalating rewards keep you coming back. Miss a day? The dungeon gets harder.</p>
+          <div class="feature-tags">
+            <span class="tag">Daily Rewards</span>
+            <span class="tag">Streak Multipliers</span>
+            <span class="tag">Bonus Loot</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal reveal-delay-1">
+          <div class="glass-card">
+            <div class="mock-ui streak">
+              <div class="mock-content">
+                <div class="mock-row" style="color:var(--neon);font-family:var(--font-display);font-size:0.65rem;align-items:center;gap:0.35rem;"><svg class="svg-icon sm icon-neon"><use href="#icon-flame"/></svg> 12 DAY STREAK</div>
+                <div style="display:flex;gap:0.35rem;margin:0.5rem 0;">
+                  <div style="flex:1;height:28px;background:rgba(0,255,136,0.2);border-radius:6px;border:1px solid var(--neon);"></div>
+                  <div style="flex:1;height:28px;background:rgba(0,255,136,0.2);border-radius:6px;border:1px solid var(--neon);"></div>
+                  <div style="flex:1;height:28px;background:rgba(0,255,136,0.2);border-radius:6px;border:1px solid var(--neon);"></div>
+                  <div style="flex:1;height:28px;background:rgba(0,255,136,0.1);border-radius:6px;border:1px dashed rgba(0,255,136,0.3);"></div>
+                </div>
+                <div class="mock-row"><span class="mock-tag" style="background:rgba(255,215,0,0.15);color:var(--gold);">2× XP BONUS ACTIVE</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE: AI COACH -->
+    <section class="feature-block cyan-glow">
+      <div class="feature-inner">
+        <div class="feature-text reveal">
+          <p class="section-label">07 · Intelligence</p>
+          <h2 class="section-title">Your AI Coach<br>Knows the Meta.</h2>
+          <p class="section-desc">Get personalized workout recommendations, progression insights, and RPG-style coaching that adapts to your stats and goals.</p>
+          <div class="feature-tags">
+            <span class="tag">Smart Coaching</span>
+            <span class="tag">Workout Plans</span>
+            <span class="tag">Progress Insights</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal reveal-delay-1">
+          <div class="glass-card">
+            <div class="mock-ui ai">
+              <div class="mock-content">
+                <div class="mock-row" style="align-items:center;gap:0.4rem;"><svg class="svg-icon md icon-cyan"><use href="#icon-cpu"/></svg><span style="color:var(--cyan);font-family:var(--font-display);font-size:0.65rem;">AI COACH</span></div>
+                <div style="background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);border-radius:10px;padding:0.75rem;font-size:0.75rem;color:#cbd5e1;margin-top:0.25rem;">
+                  "Your STR is lagging. Hit legs today for +15% boss damage bonus. Recommended: Squats 4×8."
+                </div>
+                <div class="mock-row" style="margin-top:0.25rem;"><span class="mock-tag" style="background:rgba(0,229,255,0.15);color:var(--cyan);">ACCEPT QUEST</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE: PREMIUM -->
+    <section class="feature-block purple-glow reverse">
+      <div class="feature-inner">
+        <div class="feature-text reveal">
+          <p class="section-label">08 · Premium</p>
+          <h2 class="section-title">Go Legendary.<br>Unlock Everything.</h2>
+          <p class="section-desc">Premium subscribers get exclusive worlds, advanced AI coaching, bonus XP events, and cosmetic sets that mark you as a true saga veteran.</p>
+          <div class="feature-tags">
+            <span class="tag">Exclusive Worlds</span>
+            <span class="tag">Premium Cosmetics</span>
+            <span class="tag">XP Events</span>
+          </div>
+        </div>
+        <div class="feature-visual reveal reveal-delay-1">
+          <div class="glass-card">
+            <div class="mock-ui premium">
+              <div class="mock-content" style="align-items:center;text-align:center;">
+                <div class="mock-icon-wrap"><svg class="svg-icon lg icon-gold"><use href="#icon-crown"/></svg></div>
+                <div style="font-family:var(--font-display);font-size:0.8rem;color:var(--gold);letter-spacing:0.12em;">LEGENDARY PASS</div>
+                <div style="font-size:0.7rem;color:var(--muted);margin-top:0.25rem;">Exclusive auras · Bonus worlds · AI Pro</div>
+                <div class="mock-bar" style="width:80%;margin-top:0.75rem;"><div class="mock-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--gold),#ffaa00);"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section" id="download">
+      <div class="cta-inner reveal">
+        <h2>Your Saga Starts<br>With One Workout.</h2>
+        <p>Download GymSaga and turn the gym into your dungeon. Level up for real.</p>
+        <div class="store-btns">
+          <a href="#" class="store-btn" aria-label="Download on the App Store">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            <div><small>Download on the</small><strong>App Store</strong></div>
+          </a>
+          <a href="#" class="store-btn" aria-label="Get it on Google Play">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.83.67-1.5 1.5-1.5.28 0 .53.08.76.22l13.5 7.5c.66.37.66 1.33 0 1.7l-13.5 7.5c-.23.14-.48.22-.76.22-.83 0-1.5-.67-1.5-1.5z"/></svg>
+            <div><small>Get it on</small><strong>Google Play</strong></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>© 2026 GymSaga. All rights reserved.</p>
+      <nav>
+        <a href="#privacy" data-view="privacy">Privacy Policy</a>
+        <a href="#plans" data-view="plans">Future Plans</a>
+        <a href="mailto:nelzord@gmail.com">Contact</a>
+      </nav>
+    </footer>
+  </div>
+
+  <!-- PRIVACY VIEW -->
+  <div id="view-privacy" class="view">
+    <article class="legal-view">
+      <h1>Privacy Policy</h1>
+      <p style="color:var(--muted);">Last Updated: May 2026</p>
+      <p>Welcome to GymSaga.</p>
+      <p>GymSaga (“we,” “our,” or “us”) respects your privacy and is committed to protecting the information you share with us. This Privacy Policy explains what information we collect, how we use it, and your rights regarding your information when using the GymSaga mobile application and related services.</p>
+
+      <h2>Information We Collect</h2>
+      <h3>Account Information</h3>
+      <p>When you create an account or sign in, we may collect:</p>
+      <ul>
+        <li>Email address</li>
+        <li>Authentication information</li>
+        <li>Account identifiers</li>
+      </ul>
+      <h3>Fitness &amp; Workout Data</h3>
+      <p>To provide workout tracking and progression systems, we may collect:</p>
+      <ul>
+        <li>Workout history</li>
+        <li>Exercises completed</li>
+        <li>Sets, reps, weight, and duration</li>
+        <li>Progression statistics</li>
+        <li>Fitness-related in-app data</li>
+      </ul>
+      <h3>Usage Data</h3>
+      <p>We may collect information about how you interact with the app, including:</p>
+      <ul>
+        <li>Feature usage</li>
+        <li>Session activity</li>
+        <li>App interactions</li>
+        <li>Gameplay progression</li>
+        <li>Device information</li>
+      </ul>
+      <h3>Purchases &amp; Subscriptions</h3>
+      <p>If you purchase premium features or subscriptions, we may collect:</p>
+      <ul>
+        <li>Purchase status</li>
+        <li>Subscription entitlement information</li>
+        <li>Transaction metadata</li>
+      </ul>
+      <p>GymSaga does not directly store full payment card information.</p>
+      <h3>Diagnostics &amp; Performance Data</h3>
+      <p>To improve stability and reliability, we may collect:</p>
+      <ul>
+        <li>Crash logs</li>
+        <li>Error reports</li>
+        <li>Device performance information</li>
+        <li>Diagnostic data</li>
+      </ul>
+
+      <h2>How We Use Information</h2>
+      <p>We use collected information to:</p>
+      <ul>
+        <li>Provide and maintain app functionality</li>
+        <li>Save workout and progression data</li>
+        <li>Enable account authentication and cloud syncing</li>
+        <li>Deliver premium subscription features</li>
+        <li>Improve app performance and reliability</li>
+        <li>Analyze app engagement and feature usage</li>
+        <li>Provide AI-powered coaching and workout insights</li>
+        <li>Respond to support requests</li>
+      </ul>
+
+      <h2>Third-Party Services</h2>
+      <p>GymSaga may use trusted third-party services to operate the app, including services for:</p>
+      <ul>
+        <li>Authentication</li>
+        <li>Cloud storage and databases</li>
+        <li>Subscription management</li>
+        <li>Analytics</li>
+        <li>Crash reporting</li>
+        <li>AI-powered features</li>
+      </ul>
+      <p>These providers may process limited information necessary to provide their services.</p>
+
+      <h2>Data Sharing</h2>
+      <p>We do not sell your personal information.</p>
+      <p>Information may be shared only with service providers necessary to operate GymSaga, including infrastructure, analytics, authentication, subscription, and AI functionality providers.</p>
+
+      <h2>Data Retention</h2>
+      <p>We retain information only as long as necessary to provide the app and related services, comply with legal obligations, resolve disputes, and enforce agreements.</p>
+
+      <h2>Data Security</h2>
+      <p>We implement reasonable safeguards designed to protect your information. However, no method of electronic transmission or storage is completely secure, and we cannot guarantee absolute security.</p>
+
+      <h2>Your Rights &amp; Choices</h2>
+      <p>You may:</p>
+      <ul>
+        <li>Stop using the app at any time</li>
+        <li>Request deletion of your account</li>
+        <li>Request deletion of stored data</li>
+        <li>Contact us regarding privacy concerns</li>
+      </ul>
+
+      <h2>Children's Privacy</h2>
+      <p>GymSaga is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13.</p>
+
+      <h2>Changes to This Privacy Policy</h2>
+      <p>We may update this Privacy Policy from time to time. Updates will be reflected by the "Last Updated" date above. Continued use of GymSaga after updates constitutes acceptance of the revised policy.</p>
+
+      <h2>Contact Us</h2>
+      <p>If you have questions about this Privacy Policy or requests regarding your data, contact:</p>
+      <p><a href="mailto:nelzord@gmail.com">nelzord@gmail.com</a></p>
+    </article>
+    <footer>
+      <p>© 2026 GymSaga. All rights reserved.</p>
+      <nav>
+        <a href="#home" data-view="home">Home</a>
+        <a href="#privacy" data-view="privacy">Privacy Policy</a>
+        <a href="#plans" data-view="plans">Future Plans</a>
+      </nav>
+    </footer>
+  </div>
+
+  <!-- FUTURE PLANS VIEW -->
+  <div id="view-plans" class="view">
+    <article class="legal-view">
+      <h1>Future Plans</h1>
+      <p style="color:var(--muted);">The saga is just getting started. Here's what's on the horizon.</p>
+      <div class="plans-grid">
+        <div class="plan-card">
+          <h3>COMING SOON · MULTIPLAYER RAIDS</h3>
+          <p>Team up with friends to take down world bosses. Your combined workout power determines victory.</p>
+        </div>
+        <div class="plan-card">
+          <h3>IN DEVELOPMENT · NEW WORLDS</h3>
+          <p>Additional dungeon realms with unique enemies, storylines, and legendary gear sets.</p>
+        </div>
+        <div class="plan-card">
+          <h3>PLANNED · GUILD SYSTEM</h3>
+          <p>Join or create guilds, compete on leaderboards, and earn collective rewards.</p>
+        </div>
+        <div class="plan-card">
+          <h3>PLANNED · SEASONAL EVENTS</h3>
+          <p>Limited-time challenges, exclusive cosmetics, and double XP weekends.</p>
+        </div>
+        <div class="plan-card">
+          <h3>PLANNED · APPLE WATCH &amp; WEAR OS</h3>
+          <p>Seamless workout tracking from your wrist, synced directly to your character.</p>
+        </div>
+      </div>
+    </article>
+    <footer>
+      <p>© 2026 GymSaga. All rights reserved.</p>
+      <nav>
+        <a href="#home" data-view="home">Home</a>
+        <a href="#privacy" data-view="privacy">Privacy Policy</a>
+        <a href="#plans" data-view="plans">Future Plans</a>
+      </nav>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var views = { home: 'view-home', privacy: 'view-privacy', plans: 'view-plans' };
+      var nav = document.getElementById('nav');
+      var navLinks = document.getElementById('navLinks');
+      var navToggle = document.getElementById('navToggle');
+
+      function showView(id) {
+        var viewId = views[id] ? id : 'home';
+        Object.keys(views).forEach(function (key) {
+          var el = document.getElementById('view-' + key);
+          if (el) el.classList.toggle('active', key === viewId);
+        });
+        document.body.className = 'view-' + viewId;
+        document.querySelectorAll('[data-view]').forEach(function (link) {
+          link.classList.toggle('active', link.dataset.view === viewId);
+        });
+        var titles = { home: 'GymSaga — Turn Your Workouts Into an RPG', privacy: 'Privacy Policy — GymSaga', plans: 'Future Plans — GymSaga' };
+        document.title = titles[viewId];
+        window.scrollTo(0, 0);
+        navLinks.classList.remove('open');
+      }
+
+      function handleNavClick(e) {
+        var link = e.target.closest('[data-view], [data-scroll]');
+        if (!link) return;
+        e.preventDefault();
+
+        if (link.dataset.view) {
+          var view = link.dataset.view;
+          if (location.hash !== '#' + view) history.pushState(null, '', '#' + view);
+          showView(view);
+          return;
+        }
+
+        if (link.dataset.scroll) {
+          if (!document.getElementById('view-home').classList.contains('active')) {
+            showView('home');
+            setTimeout(function () {
+              var target = document.getElementById(link.dataset.scroll);
+              if (target) target.scrollIntoView({ behavior: 'smooth' });
+            }, 50);
+          } else {
+            var target = document.getElementById(link.dataset.scroll);
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      }
+
+      function handleHash() {
+        var hash = location.hash.slice(1);
+        if (views[hash]) showView(hash);
+        else showView('home');
+      }
+
+      document.addEventListener('click', handleNavClick);
+      window.addEventListener('hashchange', handleHash);
+      window.addEventListener('popstate', handleHash);
+
+      navToggle.addEventListener('click', function () {
+        navLinks.classList.toggle('open');
+      });
+
+      window.addEventListener('scroll', function () {
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+      });
+
+      /* Scroll reveal */
+      var revealEls = document.querySelectorAll('.reveal');
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      revealEls.forEach(function (el) { observer.observe(el); });
+
+      /* Particles */
+      var canvas = document.getElementById('particles');
+      if (canvas) {
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+        var count = 60;
+
+        function resizeCanvas() {
+          canvas.width = canvas.offsetWidth;
+          canvas.height = canvas.offsetHeight;
+        }
+
+        function initParticles() {
+          particles = [];
+          for (var i = 0; i < count; i++) {
+            particles.push({
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height,
+              r: Math.random() * 1.5 + 0.5,
+              dx: (Math.random() - 0.5) * 0.4,
+              dy: (Math.random() - 0.5) * 0.4,
+              alpha: Math.random() * 0.5 + 0.2,
+              color: Math.random() > 0.5 ? '0,255,136' : '0,229,255'
+            });
+          }
+        }
+
+        function drawParticles() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          particles.forEach(function (p) {
+            p.x += p.dx;
+            p.y += p.dy;
+            if (p.x < 0) p.x = canvas.width;
+            if (p.x > canvas.width) p.x = 0;
+            if (p.y < 0) p.y = canvas.height;
+            if (p.y > canvas.height) p.y = 0;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + p.color + ',' + p.alpha + ')';
+            ctx.fill();
+          });
+          requestAnimationFrame(drawParticles);
+        }
+
+        resizeCanvas();
+        initParticles();
+        drawParticles();
+        window.addEventListener('resize', function () { resizeCanvas(); initParticles(); });
+      }
+
+      /* Hero parallax */
+      var heroPhone = document.getElementById('heroPhone');
+      if (heroPhone) {
+        window.addEventListener('mousemove', function (e) {
+          if (!document.getElementById('view-home').classList.contains('active')) return;
+          var x = (e.clientX / window.innerWidth - 0.5) * 16;
+          var y = (e.clientY / window.innerHeight - 0.5) * 10;
+          heroPhone.style.transform = 'rotateY(' + (-8 + x * 0.3) + 'deg) rotateX(' + (4 + y * 0.2) + 'deg) translateY(0)';
+        });
+      }
+
+      handleHash();
+      document.querySelectorAll('.hero .reveal').forEach(function (el) { el.classList.add('visible'); });
+    })();
+  </script>
 </body>
 </html>
