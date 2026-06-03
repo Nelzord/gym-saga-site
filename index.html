@@ -311,133 +311,28 @@
     .hero-phone-wrap {
       display: flex;
       justify-content: center;
-      perspective: 1000px;
+      perspective: 1200px;
     }
-    .phone {
+    .phone-frame {
       position: relative;
-      width: min(280px, 80vw);
-      aspect-ratio: 9/19;
-      background: linear-gradient(160deg, #1a1a22, #0d0d10);
-      border-radius: 36px;
-      border: 2px solid rgba(255, 255, 255, 0.12);
-      box-shadow:
-        0 0 0 1px rgba(0, 255, 136, 0.1),
-        0 30px 80px rgba(0, 0, 0, 0.8),
-        0 0 60px rgba(0, 255, 136, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      overflow: hidden;
+      width: min(280px, 78vw);
       animation: floatPhone 6s ease-in-out infinite;
       transform: rotateY(-8deg) rotateX(4deg);
+      filter: drop-shadow(0 40px 60px rgba(0,0,0,0.7)) drop-shadow(0 0 40px rgba(0,255,136,0.18));
+    }
+    .phone-frame img {
+      width: 100%;
+      display: block;
+      border-radius: 38px;
+      border: 2px solid rgba(255,255,255,0.13);
     }
     @keyframes floatPhone {
       0%, 100% { transform: rotateY(-8deg) rotateX(4deg) translateY(0); }
       50% { transform: rotateY(-8deg) rotateX(4deg) translateY(-14px); }
     }
-    .phone-notch {
-      position: absolute;
-      top: 10px; left: 50%;
-      transform: translateX(-50%);
-      width: 90px; height: 24px;
-      background: var(--black);
-      border-radius: 0 0 16px 16px;
-      z-index: 5;
-    }
-    .phone-screen {
-      position: absolute;
-      inset: 8px;
-      border-radius: 30px;
-      background: linear-gradient(180deg, #0f1419 0%, #060809 100%);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    .phone-ui-top {
-      padding: 2.5rem 1rem 0.75rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .phone-lvl {
-      font-family: var(--font-display);
-      font-size: 0.55rem;
-      color: var(--gold);
-      letter-spacing: 0.1em;
-    }
-    .phone-xp-bar {
-      margin: 0 1rem;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .phone-xp-fill {
-      height: 100%;
-      width: 72%;
-      background: linear-gradient(90deg, var(--neon), var(--cyan));
-      border-radius: 999px;
-      box-shadow: 0 0 10px var(--neon);
-      animation: xpPulse 2s ease-in-out infinite;
-    }
     @keyframes xpPulse {
       0%, 100% { box-shadow: 0 0 8px var(--neon); }
       50% { box-shadow: 0 0 16px var(--neon); }
-    }
-    .phone-character {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .phone-aura {
-      position: absolute;
-      width: 140px; height: 140px;
-      border: 1px solid rgba(0, 229, 255, 0.2);
-      border-radius: 50%;
-      animation: auraSpin 8s linear infinite;
-    }
-    @keyframes auraSpin { to { transform: rotate(360deg); } }
-    .phone-boss {
-      position: absolute;
-      bottom: 1rem; right: 1rem;
-      padding: 0.35rem 0.6rem;
-      background: rgba(255, 0, 80, 0.15);
-      border: 1px solid rgba(255, 50, 100, 0.4);
-      border-radius: 8px;
-      font-size: 0.55rem;
-      font-family: var(--font-display);
-      color: #ff5080;
-      letter-spacing: 0.08em;
-      animation: bossPulse 1.5s ease-in-out infinite;
-    }
-    @keyframes bossPulse {
-      0%, 100% { box-shadow: 0 0 10px rgba(255, 50, 100, 0.3); }
-      50% { box-shadow: 0 0 20px rgba(255, 50, 100, 0.6); }
-    }
-    .phone-ui-bottom {
-      padding: 0.75rem 1rem 1.25rem;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.4rem;
-    }
-    .phone-stat {
-      text-align: center;
-      padding: 0.4rem;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .phone-stat val {
-      display: block;
-      font-family: var(--font-display);
-      font-size: 0.65rem;
-      color: var(--neon);
-    }
-    .phone-stat lbl {
-      display: block;
-      font-size: 0.45rem;
-      color: var(--muted);
-      text-transform: uppercase;
     }
     .phone-glow-ring {
       position: absolute;
@@ -452,6 +347,29 @@
     @keyframes ringExpand {
       0%, 100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; }
       50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
+    }
+
+    /* Screenshot phone frames used in feature sections */
+    .screenshot-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .screenshot-phone {
+      position: relative;
+      width: min(240px, 70vw);
+      filter: drop-shadow(0 30px 50px rgba(0,0,0,0.65)) drop-shadow(0 0 30px rgba(0,255,136,0.12));
+      transition: transform 0.4s ease, filter 0.4s ease;
+    }
+    .screenshot-phone:hover {
+      transform: translateY(-6px) scale(1.02);
+      filter: drop-shadow(0 40px 60px rgba(0,0,0,0.7)) drop-shadow(0 0 40px rgba(0,255,136,0.22));
+    }
+    .screenshot-phone img {
+      width: 100%;
+      display: block;
+      border-radius: 36px;
+      border: 2px solid rgba(255,255,255,0.12);
     }
 
     /* ── SECTIONS ── */
@@ -970,25 +888,8 @@
 
         <div class="hero-phone-wrap reveal reveal-delay-2">
           <div class="phone-glow-ring"></div>
-          <div class="phone" id="heroPhone">
-            <div class="phone-notch"></div>
-            <div class="phone-screen">
-              <div class="phone-ui-top">
-                <span class="phone-lvl">LV. 47</span>
-                <span class="phone-gold"><svg class="svg-icon sm icon-gold"><use href="#icon-zap"/></svg> 2,840 G</span>
-              </div>
-              <div class="phone-xp-bar"><div class="phone-xp-fill"></div></div>
-              <div class="phone-character">
-                <div class="phone-aura"></div>
-                <div class="phone-avatar"><svg class="svg-icon icon-neon"><use href="#icon-user"/></svg></div>
-                <div class="phone-boss">BOSS NEARBY</div>
-              </div>
-              <div class="phone-ui-bottom">
-                <div class="phone-stat"><val>+420</val><lbl>XP Today</lbl></div>
-                <div class="phone-stat"><val>12</val><lbl>Day Streak</lbl></div>
-                <div class="phone-stat"><val>3</val><lbl>Worlds</lbl></div>
-              </div>
-            </div>
+          <div class="phone-frame" id="heroPhone">
+            <img src="images/battle.png" alt="GymSaga battle screen" loading="eager">
           </div>
         </div>
       </div>
@@ -1022,15 +923,9 @@
           </div>
         </div>
         <div class="feature-visual reveal reveal-delay-1">
-          <div class="glass-card">
-            <div class="mock-ui workout">
-              <div class="mock-content">
-                <div class="mock-row"><span style="color:var(--neon);font-family:var(--font-display);font-size:0.7rem;">ACTIVE SESSION</span></div>
-                <div class="mock-row" style="color:var(--white);font-size:0.9rem;font-weight:600;">Bench Press · Set 3/4</div>
-                <div class="mock-bar"><div class="mock-bar-fill" style="width:75%;background:linear-gradient(90deg,var(--neon),var(--cyan));"></div></div>
-                <div class="mock-row">225 lbs × 8 reps</div>
-                <div class="mock-row"><span class="mock-tag" style="background:rgba(0,255,136,0.15);color:var(--neon);">+85 XP</span></div>
-              </div>
+          <div class="screenshot-wrap">
+            <div class="screenshot-phone">
+              <img src="images/mid_workout.png" alt="GymSaga workout tracking">
             </div>
           </div>
         </div>
@@ -1051,14 +946,9 @@
           </div>
         </div>
         <div class="feature-visual reveal reveal-delay-1">
-          <div class="glass-card">
-            <div class="mock-ui rpg">
-              <div class="mock-content">
-                <div class="mock-row" style="justify-content:space-between;"><span style="color:var(--purple);font-family:var(--font-display);font-size:0.65rem;">SHADOW KNIGHT</span><span style="color:var(--gold);font-size:0.7rem;">LV. 47</span></div>
-                <div class="mock-row"><span>STR</span><div class="mock-bar" style="flex:1;"><div class="mock-bar-fill" style="width:88%;background:var(--purple);"></div></div><span style="color:var(--white);">88</span></div>
-                <div class="mock-row"><span>END</span><div class="mock-bar" style="flex:1;"><div class="mock-bar-fill" style="width:72%;background:var(--cyan);"></div></div><span style="color:var(--white);">72</span></div>
-                <div class="mock-row"><span>AGI</span><div class="mock-bar" style="flex:1;"><div class="mock-bar-fill" style="width:65%;background:var(--neon);"></div></div><span style="color:var(--white);">65</span></div>
-              </div>
+          <div class="screenshot-wrap">
+            <div class="screenshot-phone">
+              <img src="images/profile_avatar_page.png" alt="GymSaga character profile">
             </div>
           </div>
         </div>
@@ -1079,14 +969,9 @@
           </div>
         </div>
         <div class="feature-visual reveal reveal-delay-1">
-          <div class="glass-card">
-            <div class="mock-ui boss">
-              <div class="mock-content" style="align-items:center;text-align:center;">
-                <div class="mock-icon-wrap"><svg class="svg-icon xl icon-red"><use href="#icon-skull"/></svg></div>
-                <div style="font-family:var(--font-display);font-size:0.75rem;color:#ff5080;letter-spacing:0.1em;">IRON TITAN</div>
-                <div class="mock-bar" style="width:100%;"><div class="mock-bar-fill" style="width:34%;background:linear-gradient(90deg,#ff2060,#ff5080);animation:xpPulse 1.5s infinite;"></div></div>
-                <div class="mock-row" style="color:#ff8090;font-size:0.65rem;">YOUR WORKOUT DEALS DAMAGE</div>
-              </div>
+          <div class="screenshot-wrap">
+            <div class="screenshot-phone">
+              <img src="images/battle.png" alt="GymSaga boss battle">
             </div>
           </div>
         </div>
@@ -1107,17 +992,9 @@
           </div>
         </div>
         <div class="feature-visual reveal reveal-delay-1">
-          <div class="glass-card">
-            <div class="mock-ui gear">
-              <div class="mock-content">
-                <div class="mock-row" style="color:var(--gold);font-family:var(--font-display);font-size:0.65rem;">INVENTORY</div>
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.5rem;">
-                  <div class="mock-slot" style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);"><svg class="svg-icon md icon-gold"><use href="#icon-sword"/></svg></div>
-                  <div class="mock-slot" style="background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);"><svg class="svg-icon md icon-cyan"><use href="#icon-shield"/></svg></div>
-                  <div class="mock-slot" style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);"><svg class="svg-icon md icon-purple"><use href="#icon-sparkles"/></svg></div>
-                </div>
-                <div class="mock-row" style="margin-top:0.5rem;color:var(--gold);">2,840 G · Legendary Blade Equipped</div>
-              </div>
+          <div class="screenshot-wrap">
+            <div class="screenshot-phone">
+              <img src="images/achievement_page.png" alt="GymSaga gear rewards and achievements">
             </div>
           </div>
         </div>
@@ -1138,14 +1015,9 @@
           </div>
         </div>
         <div class="feature-visual reveal reveal-delay-1">
-          <div class="glass-card">
-            <div class="mock-ui xp">
-              <div class="mock-content">
-                <div class="mock-row" style="justify-content:space-between;color:var(--cyan);font-family:var(--font-display);font-size:0.65rem;"><span>LEVEL 47</span><span>72% TO LVL 48</span></div>
-                <div class="mock-bar" style="height:12px;"><div class="mock-bar-fill" style="width:72%;background:linear-gradient(90deg,var(--cyan),var(--neon));box-shadow:0 0 12px var(--cyan);"></div></div>
-                <div class="mock-row" style="color:var(--neon);font-size:0.8rem;font-weight:600;margin-top:0.5rem;">+420 XP · Workout Complete!</div>
-                <div class="mock-row" style="font-size:0.65rem;">New ability unlocked at Level 50</div>
-              </div>
+          <div class="screenshot-wrap">
+            <div class="screenshot-phone">
+              <img src="images/workout_complete.png" alt="GymSaga workout complete XP screen">
             </div>
           </div>
         </div>
@@ -1166,18 +1038,9 @@
           </div>
         </div>
         <div class="feature-visual reveal reveal-delay-1">
-          <div class="glass-card">
-            <div class="mock-ui streak">
-              <div class="mock-content">
-                <div class="mock-row" style="color:var(--neon);font-family:var(--font-display);font-size:0.65rem;align-items:center;gap:0.35rem;"><svg class="svg-icon sm icon-neon"><use href="#icon-flame"/></svg> 12 DAY STREAK</div>
-                <div style="display:flex;gap:0.35rem;margin:0.5rem 0;">
-                  <div style="flex:1;height:28px;background:rgba(0,255,136,0.2);border-radius:6px;border:1px solid var(--neon);"></div>
-                  <div style="flex:1;height:28px;background:rgba(0,255,136,0.2);border-radius:6px;border:1px solid var(--neon);"></div>
-                  <div style="flex:1;height:28px;background:rgba(0,255,136,0.2);border-radius:6px;border:1px solid var(--neon);"></div>
-                  <div style="flex:1;height:28px;background:rgba(0,255,136,0.1);border-radius:6px;border:1px dashed rgba(0,255,136,0.3);"></div>
-                </div>
-                <div class="mock-row"><span class="mock-tag" style="background:rgba(255,215,0,0.15);color:var(--gold);">2× XP BONUS ACTIVE</span></div>
-              </div>
+          <div class="screenshot-wrap">
+            <div class="screenshot-phone">
+              <img src="images/mid_workout.png" alt="GymSaga streak multiplier in workout">
             </div>
           </div>
         </div>
@@ -1198,15 +1061,9 @@
           </div>
         </div>
         <div class="feature-visual reveal reveal-delay-1">
-          <div class="glass-card">
-            <div class="mock-ui ai">
-              <div class="mock-content">
-                <div class="mock-row" style="align-items:center;gap:0.4rem;"><svg class="svg-icon md icon-cyan"><use href="#icon-cpu"/></svg><span style="color:var(--cyan);font-family:var(--font-display);font-size:0.65rem;">AI COACH</span></div>
-                <div style="background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);border-radius:10px;padding:0.75rem;font-size:0.75rem;color:#cbd5e1;margin-top:0.25rem;">
-                  "Your STR is lagging. Hit legs today for +15% boss damage bonus. Recommended: Squats 4×8."
-                </div>
-                <div class="mock-row" style="margin-top:0.25rem;"><span class="mock-tag" style="background:rgba(0,229,255,0.15);color:var(--cyan);">ACCEPT QUEST</span></div>
-              </div>
+          <div class="screenshot-wrap">
+            <div class="screenshot-phone">
+              <img src="images/workout_complete.png" alt="GymSaga AI coach insight">
             </div>
           </div>
         </div>
@@ -1227,14 +1084,9 @@
           </div>
         </div>
         <div class="feature-visual reveal reveal-delay-1">
-          <div class="glass-card">
-            <div class="mock-ui premium">
-              <div class="mock-content" style="align-items:center;text-align:center;">
-                <div class="mock-icon-wrap"><svg class="svg-icon lg icon-gold"><use href="#icon-crown"/></svg></div>
-                <div style="font-family:var(--font-display);font-size:0.8rem;color:var(--gold);letter-spacing:0.12em;">LEGENDARY PASS</div>
-                <div style="font-size:0.7rem;color:var(--muted);margin-top:0.25rem;">Exclusive auras · Bonus worlds · AI Pro</div>
-                <div class="mock-bar" style="width:80%;margin-top:0.75rem;"><div class="mock-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--gold),#ffaa00);"></div></div>
-              </div>
+          <div class="screenshot-wrap">
+            <div class="screenshot-phone">
+              <img src="images/worlds_preview.png" alt="GymSaga worlds and premium content">
             </div>
           </div>
         </div>
